@@ -20,6 +20,11 @@ def preprocess_loud():
     time.sleep(1)
     print "Done."
 
+    print "Filling NaN entries of 'Embarked' with Southampton('S')..."
+    train_data['Embarked'] = train_data['Embarked'].fillna("S")
+    time.sleep(1)
+    print "Done."
+
     print "Manipulating 'Embarked' column"
     print "(southampton -> 0, cherbourg -> 1, queenstown -> 2)..."
     train_data.loc[train_data['Embarked'] == 'S', 'Embarked'] = 0
@@ -41,6 +46,7 @@ def preprocess_silent():
     train_data.loc[train_data['Sex'] == 'male', 'Sex'] = 0
     train_data.loc[train_data['Sex'] == 'female', 'Sex'] = 1
 
+    train_data['Embarked'] = train_data['Embarked'].fillna('S')
     train_data.loc[train_data['Embarked'] == 'S', 'Embarked'] = 0
     train_data.loc[train_data['Embarked'] == 'C', 'Embarked'] = 1
     train_data.loc[train_data['Embarked'] == 'Q', 'Embarked'] = 2
