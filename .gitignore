@@ -1,0 +1,6 @@
+# idea project files
+.idea/*
+
+# python module files
+*.pyc
+
