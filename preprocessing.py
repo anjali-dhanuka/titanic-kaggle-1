@@ -2,7 +2,7 @@ import pandas as pd
 import time
 
 
-def preprocess():
+def preprocess_loud():
     train_data = pd.read_csv('data/train.csv')
 
     print "Brief description of the data: "
@@ -33,5 +33,20 @@ def preprocess():
     print train_data.describe()
 
 
+def preprocess_silent():
+    train_data = pd.read_csv('data/train.csv')
+
+    train_data['Age'] = train_data['Age'].fillna(train_data['Age'].median())
+
+    train_data.loc[train_data['Sex'] == 'male', 'Sex'] = 0
+    train_data.loc[train_data['Sex'] == 'female', 'Sex'] = 1
+
+    train_data.loc[train_data['Embarked'] == 'S', 'Embarked'] = 0
+    train_data.loc[train_data['Embarked'] == 'C', 'Embarked'] = 1
+    train_data.loc[train_data['Embarked'] == 'Q', 'Embarked'] = 2
+
+    return train_data
+
+
 if __name__ == '__main__':
-    preprocess()
+    preprocess_loud()
