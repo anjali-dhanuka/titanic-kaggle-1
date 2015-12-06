@@ -6,7 +6,8 @@ import numpy as np
 predictors = ["Pclass", "Age", "SibSp", "Parch", "Fare", "Embarked"]
 
 lin_reg = LinearRegression()
-train_data = preproc.preprocess_silent()
+train_data = preproc.preprocess_silent("train")
+test_data = preproc.preprocess_silent("test")
 
 kfold = KFold(train_data.shape[0], n_folds=3, random_state=1)
 

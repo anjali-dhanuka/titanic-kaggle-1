@@ -2,57 +2,58 @@ import pandas as pd
 import time
 
 
-def preprocess_loud():
-    train_data = pd.read_csv('data/train.csv')
+def preprocess_loud(train_or_test):
+    print "Preprocessing " + train_or_test + " data: "
+    data = pd.read_csv('data/' + train_or_test + '.csv')
 
     print "Brief description of the data: "
     time.sleep(1)
-    print train_data.describe()
+    print data.describe()
 
     print "Filling NaN entries of 'Age' with the median of existing entries..."
-    train_data['Age'] = train_data['Age'].fillna(train_data['Age'].median())
+    data['Age'] = data['Age'].fillna(data['Age'].median())
     time.sleep(1)
     print "Done."
 
     print "Manipulating 'Sex' column (male -> 0, female -> 1)..."
-    train_data.loc[train_data['Sex'] == 'male', 'Sex'] = 0
-    train_data.loc[train_data['Sex'] == 'female', 'Sex'] = 1
+    data.loc[data['Sex'] == 'male', 'Sex'] = 0
+    data.loc[data['Sex'] == 'female', 'Sex'] = 1
     time.sleep(1)
     print "Done."
 
     print "Filling NaN entries of 'Embarked' with Southampton('S')..."
-    train_data['Embarked'] = train_data['Embarked'].fillna("S")
+    data['Embarked'] = data['Embarked'].fillna("S")
     time.sleep(1)
     print "Done."
 
     print "Manipulating 'Embarked' column"
     print "(southampton -> 0, cherbourg -> 1, queenstown -> 2)..."
-    train_data.loc[train_data['Embarked'] == 'S', 'Embarked'] = 0
-    train_data.loc[train_data['Embarked'] == 'C', 'Embarked'] = 1
-    train_data.loc[train_data['Embarked'] == 'Q', 'Embarked'] = 2
+    data.loc[data['Embarked'] == 'S', 'Embarked'] = 0
+    data.loc[data['Embarked'] == 'C', 'Embarked'] = 1
+    data.loc[data['Embarked'] == 'Q', 'Embarked'] = 2
     time.sleep(1)
     print "Done."
 
     print "Final description of the data:"
     time.sleep(1)
-    print train_data.describe()
+    print data.describe()
 
 
-def preprocess_silent():
-    train_data = pd.read_csv('data/train.csv')
+def preprocess_silent(train_or_test):
+    data = pd.read_csv('data/' + train_or_test + '.csv')
 
-    train_data['Age'] = train_data['Age'].fillna(train_data['Age'].median())
+    data['Age'] = data['Age'].fillna(data['Age'].median())
 
-    train_data.loc[train_data['Sex'] == 'male', 'Sex'] = 0
-    train_data.loc[train_data['Sex'] == 'female', 'Sex'] = 1
+    data.loc[data['Sex'] == 'male', 'Sex'] = 0
+    data.loc[data['Sex'] == 'female', 'Sex'] = 1
 
-    train_data['Embarked'] = train_data['Embarked'].fillna('S')
-    train_data.loc[train_data['Embarked'] == 'S', 'Embarked'] = 0
-    train_data.loc[train_data['Embarked'] == 'C', 'Embarked'] = 1
-    train_data.loc[train_data['Embarked'] == 'Q', 'Embarked'] = 2
+    data['Embarked'] = data['Embarked'].fillna('S')
+    data.loc[data['Embarked'] == 'S', 'Embarked'] = 0
+    data.loc[data['Embarked'] == 'C', 'Embarked'] = 1
+    data.loc[data['Embarked'] == 'Q', 'Embarked'] = 2
 
-    return train_data
+    return data
 
 
 if __name__ == '__main__':
-    preprocess_loud()
+    preprocess_loud("train")
