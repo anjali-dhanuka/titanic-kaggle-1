@@ -1,6 +1,7 @@
 from sklearn.linear_model import LinearRegression
 from sklearn.cross_validation import KFold
 import preprocess_data as preproc
+import numpy as np
 
 predictors = ["Pclass", "Age", "SibSp", "Parch", "Fare", "Embarked"]
 
@@ -21,4 +22,9 @@ def hypothesis_fitting():
 
         predictions.append(test_predictions)
 
-    return predictions
+        predictions = np.concatenate(predictions)
+        predictions[predictions > .5] = 1
+        predictions[predictions <=.5] = 0
+
+        accuracy = sum(predictions[predictions == train_data["Survived"]]) / len(predictions)
+    return accuracy
