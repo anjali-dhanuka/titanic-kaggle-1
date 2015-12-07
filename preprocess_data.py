@@ -15,6 +15,11 @@ def preprocess_loud(train_or_test):
     time.sleep(1)
     print "Done."
 
+    print "Filling NaN entries of 'Fare' with the median of existing entries..."
+    data['Fare'] = data['Fare'].fillna(data['Fare'].median())
+    time.sleep(1)
+    print "Done."
+
     print "Manipulating 'Sex' column (male -> 0, female -> 1)..."
     data.loc[data['Sex'] == 'male', 'Sex'] = 0
     data.loc[data['Sex'] == 'female', 'Sex'] = 1
@@ -43,6 +48,7 @@ def preprocess_silent(train_or_test):
     data = pd.read_csv('data/' + train_or_test + '.csv')
 
     data['Age'] = data['Age'].fillna(data['Age'].median())
+    data['Fare'] = data['Fare'].fillna(data['Fare'].median())
 
     data.loc[data['Sex'] == 'male', 'Sex'] = 0
     data.loc[data['Sex'] == 'female', 'Sex'] = 1
