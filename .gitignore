@@ -4,3 +4,5 @@
 # python module files
 *.pyc
 
+# generated output files
+bin/*
