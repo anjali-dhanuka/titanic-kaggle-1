@@ -7,7 +7,6 @@ import numpy as np
 predictors = ["Pclass", "Age", "SibSp", "Parch", "Fare", "Embarked"]
 
 lin_reg = LinearRegression()
-log_reg = LogisticRegression(random_state=1)
 
 train_data = preproc.preprocess_silent("train")
 test_data = preproc.preprocess_silent("test")
@@ -15,7 +14,7 @@ test_data = preproc.preprocess_silent("test")
 kfold = KFold(train_data.shape[0], n_folds=3, random_state=1)
 
 
-def fit_and_predict_linreg():
+def train_linreg():
     predictions = []
     for train, test in kfold:
         train_predictors = train_data[predictors].iloc[train, :]
@@ -34,21 +33,26 @@ def fit_and_predict_linreg():
     return accuracy
 
 
-def fit_and_predict_logreg():
-    log_reg.fit(train_data[predictors], train_data["Survived"])
+def test_linreg():
+    predictions = lin_reg.predict(test_data[predictors])
 
-    predictions = log_reg.predict(test_data[predictors])
+    predictions_int = []
+    for prediction in predictions:
+        if prediction < 0.5:
+            predictions_int.append(0)
+        else:
+            predictions_int.append(1)
 
     submission = pd.DataFrame({
         "PassengerId": test_data["PassengerId"],
-        "Survived": predictions
+        "Survived": predictions_int
     })
 
     return submission
 
 
 if __name__ == '__main__':
-    regr_accuracy = fit_and_predict_linreg()
+    regr_accuracy = train_linreg()
     print "Accuracy of prediction: %s" % regr_accuracy
-    kaggle_submission = fit_and_predict_logreg()
+    kaggle_submission = test_linreg()
     kaggle_submission.to_csv('bin/kaggle.csv', index=False)
