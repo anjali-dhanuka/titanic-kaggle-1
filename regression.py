@@ -26,11 +26,11 @@ def fit_and_predict_linreg():
 
         predictions.append(test_predictions)
 
-        predictions = np.concatenate(predictions)
-        predictions[predictions > .5] = 1
-        predictions[predictions <=.5] = 0
+    predictions = np.concatenate(predictions)
+    predictions[predictions > .5] = 1
+    predictions[predictions <=.5] = 0
 
-        accuracy = sum(predictions[predictions == train_data["Survived"]]) / len(predictions)
+    accuracy = sum(predictions[predictions == train_data["Survived"]]) / len(predictions)
     return accuracy
 
 
@@ -45,3 +45,10 @@ def fit_and_predict_logreg():
     })
 
     return submission
+
+
+if __name__ == '__main__':
+    regr_accuracy = fit_and_predict_linreg()
+    print "Accuracy of prediction: %s" % regr_accuracy
+    kaggle_submission = fit_and_predict_logreg()
+    kaggle_submission.to_csv('bin/kaggle.csv', index=False)
