@@ -15,6 +15,20 @@ def random_forest_impl(train_data):
     print score.mean()
 
 
+def new_features(train_data):
+    train_data["FamilySize"] = train_data["SibSp"] + train_data["Parch"]
+    train_data["NameLength"] = train_data["Name"].apply(lambda x: len(x))
+    print "Added two new features: FamilySize and NameLength..."
+
+    return train_data
+
+
 if __name__ == '__main__':
     titanic_training_data = preproc.preprocess_silent("train")
+    random_forest_impl(titanic_training_data)
+
+    titanic_training_data = new_features(titanic_training_data)
+    predictors.append("FamilySize")
+    predictors.append("NameLength")
+
     random_forest_impl(titanic_training_data)
