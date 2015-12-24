@@ -6,22 +6,32 @@ import re
 predictors = ["Pclass", "Sex", "Age", "SibSp", "Parch", "Fare", "Embarked"]
 
 
-def random_forest_impl(train_data):
-    algo = RandomForestClassifier(n_estimators=150, min_samples_split=4,
+def random_forest_impl(titanic):
+    algo = RandomForestClassifier(n_estimators=200, min_samples_split=4,
                                   min_samples_leaf=2, random_state=1)
 
-    score = cross_validation.cross_val_score(algo, train_data[predictors],
-                                             train_data["Survived"], cv=3)
+    score = cross_validation.cross_val_score(algo, titanic[predictors],
+                                             titanic["Survived"], cv=3)
 
-    print score.mean()
+    return score.mean()
 
 
-def new_features(train_data):
-    train_data["FamilySize"] = train_data["SibSp"] + train_data["Parch"]
-    train_data["NameLength"] = train_data["Name"].apply(lambda x: len(x))
-    print "Added two new features: FamilySize and NameLength..."
+def add_feat_family_size(titanic):
+    titanic["FamilySize"] = titanic["SibSp"] + titanic["Parch"]
+    predictors.append("FamilySize")
 
-    titles = train_data["Name"].apply(get_title)
+    return titanic
+
+
+def add_feat_name_length(titanic):
+    titanic["NameLength"] = titanic["Name"].apply(lambda x:len(x))
+    predictors.append("NameLength")
+
+    return titanic
+
+
+def add_feat_title(titanic):
+    titles = titanic["Name"].apply(get_title)
 
     title_mapping = {"Mr": 1, "Miss": 2, "Mrs": 3, "Master": 4, "Dr": 5, "Rev": 6, "Major": 7, "Col": 7,
                      "Mlle": 8, "Mme": 8, "Don": 9, "Lady": 10, "Countess": 10, "Jonkheer": 10, "Sir": 9,
@@ -29,11 +39,9 @@ def new_features(train_data):
 
     for key, value in title_mapping.items():
         titles[titles == key] = value
-
-    train_data["Title"] = titles
-    print "Added a new feature: Title..."
-
-    return train_data
+    titanic["Title"] = titles
+    predictors.append("Title")
+    return titanic
 
 
 def get_title(name):
@@ -45,11 +53,21 @@ def get_title(name):
 
 
 if __name__ == '__main__':
-    titanic_training_data = preproc.preprocess_silent("train")
-    random_forest_impl(titanic_training_data)
+    titanic_train = preproc.preprocess_silent("train")
+    cross_val_score = random_forest_impl(titanic_train)
+    print "Cross Validation Score: " + str(cross_val_score)
 
-    titanic_training_data = new_features(titanic_training_data)
-    predictors.append("FamilySize")
-    predictors.append("NameLength")
-    predictors.append("Title")
-    random_forest_impl(titanic_training_data)
+    titanic_train = add_feat_name_length(titanic_train)
+    print "Added new feature: NameLength."
+    cross_val_score = random_forest_impl(titanic_train)
+    print "Improved Cross Validation Score: " + str(cross_val_score)
+
+    titanic_train = add_feat_family_size(titanic_train)
+    print "Added new feature: FamilySize."
+    cross_val_score = random_forest_impl(titanic_train)
+    print "Improved Cross Validation Score: " + str(cross_val_score)
+
+    titanic_train = add_feat_title(titanic_train)
+    print "Added new feature: Title."
+    cross_val_score = random_forest_impl(titanic_train)
+    print "Improved Cross Validation Score: " + str(cross_val_score)
