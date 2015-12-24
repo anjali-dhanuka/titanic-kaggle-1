@@ -7,14 +7,13 @@ import numpy as np
 import operator
 import re
 
+algo = RandomForestClassifier(random_state=1, n_estimators=150, min_samples_split=8, min_samples_leaf=4)
+
 predictors = ["Pclass", "Sex", "Age", "SibSp", "Parch", "Fare", "Embarked"]
 family_id_mapping = dict()
 
 
 def random_forest_impl(titanic):
-    algo = RandomForestClassifier(n_estimators=200, min_samples_split=4,
-                                  min_samples_leaf=2, random_state=1)
-
     score = cross_validation.cross_val_score(algo, titanic[predictors],
                                              titanic["Survived"], cv=3)
 
@@ -90,7 +89,6 @@ def feature_selection(titanic):
 
 def best_features_classification(titanic):
     predictors = ["Pclass", "Sex", "Fare", "Title"]
-    algo = RandomForestClassifier(random_state=1, n_estimators=150, min_samples_split=8, min_samples_leaf=4)
     scores = cross_validation.cross_val_score(algo, titanic[predictors], titanic["Survived"], cv=3)
 
     return scores.mean()
