@@ -1,9 +1,12 @@
+import pandas
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import cross_validation
 import preprocess_data as preproc
+import operator
 import re
 
 predictors = ["Pclass", "Sex", "Age", "SibSp", "Parch", "Fare", "Embarked"]
+family_id_mapping = dict()
 
 
 def random_forest_impl(titanic):
@@ -44,12 +47,36 @@ def add_feat_title(titanic):
     return titanic
 
 
+def add_feat_family_id(titanic):
+    family_ids = titanic.apply(get_family_id, axis=1)
+    family_ids[titanic["FamilySize"] < 3] = -1
+
+    titanic["FamilyId"] = family_ids
+    predictors.append("FamilyId")
+    print(pandas.value_counts(family_ids))
+    return titanic
+
+
 def get_title(name):
     title_search = re.search(" ([A-Za-z]+)\.", name)
 
     if title_search:
         return title_search.group(1)
     return ""
+
+
+def get_family_id(row):
+    last_name = row["Name"].split(",")[0]
+    family_id = last_name + str(row["FamilySize"])
+
+    if family_id not in family_id_mapping:
+        if len(family_id_mapping) == 0:
+            current_id = 1
+        else:
+            current_id = (max(family_id_mapping.items(), key=operator.itemgetter(1))[1] + 1)
+
+        family_id_mapping[family_id] = current_id
+    return family_id_mapping[family_id]
 
 
 if __name__ == '__main__':
@@ -69,5 +96,10 @@ if __name__ == '__main__':
 
     titanic_train = add_feat_title(titanic_train)
     print "Added new feature: Title."
+    cross_val_score = random_forest_impl(titanic_train)
+    print "Improved Cross Validation Score: " + str(cross_val_score)
+
+    titanic_train = add_feat_family_id(titanic_train)
+    print "Added new feature: Family Id."
     cross_val_score = random_forest_impl(titanic_train)
     print "Improved Cross Validation Score: " + str(cross_val_score)
