@@ -1,7 +1,9 @@
-import pandas
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.feature_selection import SelectKBest, f_classif
 from sklearn import cross_validation
 import preprocess_data as preproc
+import matplotlib.pyplot as plt
+import numpy as np
 import operator
 import re
 
@@ -27,7 +29,7 @@ def add_feat_family_size(titanic):
 
 
 def add_feat_name_length(titanic):
-    titanic["NameLength"] = titanic["Name"].apply(lambda x:len(x))
+    titanic["NameLength"] = titanic["Name"].apply(lambda x: len(x))
     predictors.append("NameLength")
 
     return titanic
@@ -53,7 +55,7 @@ def add_feat_family_id(titanic):
 
     titanic["FamilyId"] = family_ids
     predictors.append("FamilyId")
-    print(pandas.value_counts(family_ids))
+
     return titanic
 
 
@@ -77,6 +79,21 @@ def get_family_id(row):
 
         family_id_mapping[family_id] = current_id
     return family_id_mapping[family_id]
+
+
+def feature_selection(titanic):
+    selector = SelectKBest(f_classif, k=5)
+    selector.fit(titanic[predictors], titanic["Survived"])
+
+    return -np.log10(selector.pvalues_)
+
+
+def best_features_classification(titanic):
+    predictors = ["Pclass", "Sex", "Fare", "Title"]
+    algo = RandomForestClassifier(random_state=1, n_estimators=150, min_samples_split=8, min_samples_leaf=4)
+    scores = cross_validation.cross_val_score(algo, titanic[predictors], titanic["Survived"], cv=3)
+
+    return scores.mean()
 
 
 if __name__ == '__main__':
@@ -103,3 +120,11 @@ if __name__ == '__main__':
     print "Added new feature: Family Id."
     cross_val_score = random_forest_impl(titanic_train)
     print "Improved Cross Validation Score: " + str(cross_val_score)
+
+    scores = feature_selection(titanic_train)
+    plt.bar(range(len(predictors)), scores)
+    plt.xticks(range(len(predictors)), predictors, rotation='vertical')
+    plt.show()
+
+    cross_val_score = best_features_classification(titanic_train)
+    print "After best features, the final Cross Validation Score:" + str(cross_val_score)
